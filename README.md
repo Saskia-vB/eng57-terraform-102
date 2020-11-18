@@ -45,12 +45,6 @@ Example usage:
 6) Calls terraform script to create infrastructure and deploy new AMI (with new code)
 
 
-
-
-
-
-
-
 The conjuntion of the two, allows us to define our infrastructure as code.
 
 Along with Version control - such as git; and cloud providers, it all allows us to maintain and manipulate infrastructure in ways that where not possible beffore.
@@ -75,8 +69,32 @@ Set these in your enviroment variables using the correct naming conventions.
 - `terraform plan`
 - `terraform apply`
 - `terraform destroy`
+- `terraform refresh``
 
+### Creating modules
+#### Structure
+- Modules
+  - app_tier
+    - main.tf
+    - outputs.tf
+    - variables.tf
+  - db_tier
+    - main.tf
+    - outputs.tf
+    - variables.tf
+##### Call modules
+- in general main.tf file:
 
-
-
-
+``terraform
+module "app_tier" {
+  source = "./modules/app_tier"
+  vpc_id = aws_vpc.mainvpc.id
+  name = var.name
+  my-ip = var.my-ip
+  internet_gateway_id = aws_internet_gateway.gw.id
+  #db_private_ip = aws_instance.db.private_ip
+  db_private_ip = module.db_tier.db_private_ip
+  ami-web = var.ami-web
+  ssh_key_var = var.ssh_key
+}
+``
